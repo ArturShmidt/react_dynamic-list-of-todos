@@ -14,26 +14,34 @@ export const TodoModal: React.FC<Props> = ({ todo, closeMod }) => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!todo) {
-      return;
+  const loadUser = async (userId: number) => {
+    try {
+      setUser(null);
+      setError(null);
+      setModalLoad(true);
+
+      const fetchedUser = await getUser(userId);
+
+      setUser(fetchedUser);
+    } catch {
+      setError('User loading failed!!!');
+    } finally {
+      setModalLoad(false);
     }
+  };
 
-    setUser(null);
-    setError(null);
-
-    setModalLoad(true);
-
-    getUser(todo.userId)
-      .then(setUser)
-      .catch(() => setError('User loading failed!!!'))
-      .finally(() => setModalLoad(false));
+  useEffect(() => {
+    if (todo) {
+      loadUser(todo.userId);
+    }
   }, [todo]);
 
   return (
     <div className="modal is-active" data-cy="modal">
       <div className="modal-background" />
-      {modalLoad && <Loader />}{' '}
+
+      {modalLoad && <Loader />}
+
       {!modalLoad && !error && user && (
         <div className="modal-card">
           <header className="modal-card-head">
@@ -49,7 +57,7 @@ export const TodoModal: React.FC<Props> = ({ todo, closeMod }) => {
               type="button"
               className="delete"
               data-cy="modal-close"
-              onClick={() => closeMod()}
+              onClick={closeMod}
             />
           </header>
 
@@ -59,11 +67,10 @@ export const TodoModal: React.FC<Props> = ({ todo, closeMod }) => {
             </p>
 
             <p className="block" data-cy="modal-user">
-              {/* <strong className="has-text-success">Done</strong> */}
               <strong
                 className={`${todo?.completed ? 'has-text-success' : 'has-text-danger'}`}
               >
-                {`${todo?.completed ? 'Done' : 'Planned'}`}
+                {todo?.completed ? 'Done' : 'Planned'}
               </strong>
 
               {' by '}

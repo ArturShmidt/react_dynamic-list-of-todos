@@ -1,9 +1,11 @@
+import { Dispatch, SetStateAction } from 'react';
+
 interface Props {
   enableTitle: () => void;
-  setQuery: React.Dispatch<React.SetStateAction<string>>;
+  setQuery: Dispatch<SetStateAction<string>>;
   query: string;
   chousedFilter: string;
-  setChousedFilter: React.Dispatch<React.SetStateAction<string>>;
+  setChousedFilter: Dispatch<SetStateAction<string>>;
 }
 
 export const TodoFilter: React.FC<Props> = ({
@@ -44,7 +46,7 @@ export const TodoFilter: React.FC<Props> = ({
 
         <span className="icon is-right" style={{ pointerEvents: 'all' }}>
           {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-          {query !== '' && (
+          {!!query && (
             <button
               data-cy="clearSearchButton"
               type="button"

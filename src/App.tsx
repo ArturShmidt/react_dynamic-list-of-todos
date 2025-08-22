@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -21,16 +21,24 @@ export const App: React.FC = () => {
   const [chousedFilter, setChousedFilter] = useState('all');
 
   useEffect(() => {
-    getTodos()
-      .then(setTodos)
-      .catch(() => setShowError('Loading failed!!!'))
-      .finally(() => setLoading(false));
+    const loadTodos = async () => {
+      try {
+        const data = await getTodos();
+
+        setTodos(data);
+      } catch {
+        setShowError('Loading failed!!!');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTodos();
   }, []);
 
   const handleOpenMod = (todo: Todo) => {
     if (todo) {
       setSelectedTodo(todo);
-
       setIsModalOpen(true);
     }
   };
@@ -45,15 +53,15 @@ export const App: React.FC = () => {
   };
 
   const getVisibleTodos = (
-    tod: Todo[],
-    que: string,
+    todosList: Todo[],
+    queryFilter: string,
     chousedFilt: string,
   ): Todo[] => {
-    let visibleTodos = [...tod];
+    let visibleTodos = [...todosList];
 
-    if (que.trim() !== '') {
+    if (queryFilter.trim() !== '') {
       visibleTodos = visibleTodos.filter(todo =>
-        todo.title.toLowerCase().includes(que.toLowerCase().trim()),
+        todo.title.toLowerCase().includes(queryFilter.toLowerCase().trim()),
       );
     }
 
@@ -68,7 +76,9 @@ export const App: React.FC = () => {
     return visibleTodos;
   };
 
-  const visibleTodos = getVisibleTodos(todos, query, chousedFilter);
+  const visibleTodos = useMemo(() => {
+    return getVisibleTodos(todos, query, chousedFilter);
+  }, [todos, query, chousedFilter]);
 
   return (
     <>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Todo } from '../../types/Todo';
+import classNames from 'classnames';
 
 interface Prors {
   todos: Todo[];
@@ -8,7 +9,7 @@ interface Prors {
 }
 
 export const TodoList: React.FC<Prors> = ({ todos, openMod, selectedTodo }) => {
-  if (todos.length === 0) {
+  if (!todos.length) {
     return <p data-cy="no-todos-message">No todos found</p>;
   }
 
@@ -40,7 +41,10 @@ export const TodoList: React.FC<Prors> = ({ todos, openMod, selectedTodo }) => {
             </td>
             <td className="is-vcentered is-expanded">
               <p
-                className={`${todo.completed ? 'has-text-success' : 'has-text-danger'}`}
+                className={classNames({
+                  'has-text-success': todo.completed,
+                  'has-text-danger': !todo.completed,
+                })}
               >
                 {todo.title}
               </p>
